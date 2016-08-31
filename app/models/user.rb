@@ -1,4 +1,4 @@
 class User < ApplicationRecord
   has_many :accounts
-  has_many :transaction_logs
+  has_many :activity_logs
 end
