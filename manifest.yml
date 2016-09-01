@@ -6,3 +6,5 @@ applications:
   name: genie-api
   host: genie-api
   disk_quota: 1024M
+  services:
+    - postgres
