@@ -8,6 +8,7 @@ gem 'pg', '~> 0.18.1'
 
 group :development do
   gem 'listen'
+  gem 'figaro'
 end
 
 group :development, :test do
