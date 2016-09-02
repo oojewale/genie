@@ -1,12 +1,8 @@
 class WatsonConversationService
   def self.setup
-    # convo = JSON.parse(ENV["VCAP_SERVICES"])['conversation'].first['credentials']
-    convo = {
-      "password" => "cwWxFRsfFt5G",
-     "url" => "https://gateway.watsonplatform.net/conversation/api",
-     "username" => "e3871a01-8c90-4a94-bd6a-16889aaab486"
-    }
-    wkspace_id = ENV["CONV_WORKSPACE_ID"] || '757ce602-237a-4326-974d-b8097a3bd86e'
+    convo = JSON.parse(ENV["VCAP_SERVICES"])['conversation'].first['credentials']
+
+    wkspace_id = ENV["CONV_WORKSPACE_ID"]
     url = convo['url'] + '/v1/workspaces/' +wkspace_id + '/message?version=2016-07-11'
 
     new(url, convo)
@@ -15,14 +11,10 @@ class WatsonConversationService
   attr_reader :watson_connection, :entities, :intents, :verdict
 
   def initialize(url, convo)
-    @convo = convo
-    user = convo['username'] || 'e3871a01-8c90-4a94-bd6a-16889aaab486'
-    pass = convo['password'] || 'cwWxFRsfFt5G'
-puts url
     @watson_connection = Faraday.new(url: url) do |f|
       f.adapter Faraday.default_adapter
     end
-    @watson_connection.basic_auth(user, pass)
+    @watson_connection.basic_auth(convo['username'], convo['password'])
   end
 
   def prepare_payload(key, txt)
@@ -58,8 +50,9 @@ puts url
 
     pkg = JSON.parse(r.body)
     parse_response(pkg)
+
     save_context(pkg)
-    puts pkg
+    pkg["output"]["text"].join(", ")
   end
 
   def parse_response(pkg)

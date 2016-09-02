@@ -56,12 +56,12 @@ ActiveRecord::Schema.define(version: 20160901063252) do
 
   create_table "conversation_contexts", force: :cascade do |t|
     t.string   "key"
-    t.text     "dialog_stack",    default: [],              array: true
-    t.integer  "turn_counter"
-    t.integer  "request_counter"
+    t.text     "dialog_stack",    default: ["root"],              array: true
+    t.integer  "turn_counter",    default: 1
+    t.integer  "request_counter", default: 1
     t.string   "convo_id"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
   end
 
   create_table "users", force: :cascade do |t|
