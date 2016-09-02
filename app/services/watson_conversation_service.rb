@@ -1,14 +1,13 @@
 class WatsonConversationService
   def self.setup
     convo = JSON.parse(ENV["VCAP_SERVICES"])['conversation'].first['credentials']
-
     wkspace_id = ENV["CONV_WORKSPACE_ID"]
     url = convo['url'] + '/v1/workspaces/' +wkspace_id + '/message?version=2016-07-11'
 
     new(url, convo)
   end
 
-  attr_reader :watson_connection, :entities, :intents, :verdict
+  attr_reader :watson_connection, :entities, :intents, :verdict, :user
 
   def initialize(url, convo)
     @watson_connection = Faraday.new(url: url) do |f|
@@ -18,7 +17,7 @@ class WatsonConversationService
   end
 
   def prepare_payload(key, txt)
-    @payload = { alternate_text: false }
+    @payload = {}
     @key = key
     set_input(txt)
     set_context(key)
@@ -39,6 +38,7 @@ class WatsonConversationService
     }
     ctx["conversation_id"] = stack.convo_id if stack.convo_id
     @payload['context'] = ctx
+    @payload['context']['username'] = stack.user.fullname if stack.user_id
   end
 
   def add_context_field(key, value)
@@ -53,9 +53,15 @@ class WatsonConversationService
     end
 
     pkg = JSON.parse(r.body)
+    save_context(pkg)
     parse_response(pkg)
 
-    save_context(pkg)
+    ctx = pkg['context']
+    if pkg['context']['action']
+      act = ctx['action']
+      return send(act, ctx)
+    end
+
     pkg["output"]["text"].join(", ")
   end
 
@@ -73,16 +79,53 @@ class WatsonConversationService
     wID = pkg["conversation_id"]
 
     ctx = get_stack || ConversationContext.new(key: @key)
-    ctx.update_attributes({
-               dialog_stack: stack,
-               turn_counter: turn_counter,
-               request_counter: request_counter,
-               convo_id: wID
-               }
-             )
+    @user = ctx.user if ctx.user_id
+    attributes = {
+             dialog_stack: stack,
+             turn_counter: turn_counter,
+             request_counter: request_counter,
+             convo_id: wID
+           }
+    attributes[:user_id] = user.id if user
+    ctx.update_attributes(attributes)
+  end
+
+  def validate_account(ctx)
+    acc = Account.includes(:user).find_by(account_num: ctx['account_no'])
+    if acc
+      @user = acc.user
+      update_context_user(user)
+      prepare_payload(@key, 'yes')
+      validation_status(true)
+      add_context_field('username', user.fullname)
+    else
+      validation_status(false)
+    end
+    send_to_watson
+  end
+
+  def validate_otp(ctx)
+    otp = user.otps.find_by(value: ctx['otp'])
+    if otp
+      prepare_payload(@key, 'yes')
+      validation_status(true)
+      add_context_field('username', user.fullname)
+      otp.destroy
+    else
+      add_context_field('valid', false)
+    end
+    send_to_watson
+  end
+
+  def validation_status(status)
+    add_context_field('valid', status)
   end
 
   def get_stack
-    ConversationContext.find_by(key: @key) || ConversationContext.new(key: @key)
+    ConversationContext.includes(:user).find_by(key: @key) || ConversationContext.new(key: @key)
+  end
+
+  def update_context_user(user)
+    ConversationContext.find_by(key: @key).update_attributes(user: user)
   end
 end
