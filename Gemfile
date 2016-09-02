@@ -4,6 +4,7 @@ ruby "2.3.0"
 gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
 gem 'faraday'
 gem 'pg', '~> 0.18.1'
+gem 'rack-cors', :require => 'rack/cors'
 # gem 'jbuilder'
 
 group :development do
