@@ -7,9 +7,6 @@ class Api::V1::ConversationsController < ApplicationController
     @watson.prepare_payload(convo_key, msg)
     reply = @watson.send_to_watson
 
-    entities = @watson.entities
-    intents = @watson.intents
-
     @response = {text: reply}
     render json: @response
   end
