@@ -41,6 +41,10 @@ class WatsonConversationService
     @payload['context'] = ctx
   end
 
+  def add_context_field(key, value)
+    @payload['context'][key] = value
+  end
+
   def send_to_watson
     r = watson_connection.post do |req|
       req.headers['Content-Type'] = 'application/json'

@@ -1,6 +1,6 @@
 class Api::V1::WebhookController < Api::V1::ConversationsController
   def verify
-    if (params['hub.mode'] === 'subscribe' && params['hub.verify_token'] === "VALIDATION_TOKEN")
+    if (params['hub.mode'] == 'subscribe' && params['hub.verify_token'] == "VALIDATION_TOKEN")
       render json: params['hub.challenge']
     else
       head 403
@@ -22,6 +22,7 @@ class Api::V1::WebhookController < Api::V1::ConversationsController
             user = get_user_info(fb_user_id)
 
             @watson.prepare_payload(fb_user_id, msg)
+            @watson.add_context_field('user', user["first_name"])
             reply = @watson.send_to_watson
 
             response = FbTemplateBuilder.default("Hello #{user["last_name"]}\n#{reply}")
