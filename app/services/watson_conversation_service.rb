@@ -9,7 +9,7 @@ class WatsonConversationService
     new(url, convo)
   end
 
-  attr_reader :watson_connection, :entities, :intents, :verdict, :user
+  attr_reader :watson_connection, :entities, :intents, :verdict, :user, :image
 
   def initialize(url, convo)
     @watson_connection = Faraday.new(url: url) do |f|
@@ -52,6 +52,10 @@ class WatsonConversationService
       req.headers['Content-Type'] = 'application/json'
       req.headers['Accept'] = 'application/json'
       req.body = @payload.to_json
+    end
+
+    if r.status != 200
+      return "Terror has been unleashed in cloud! Wait a while and try again 😰"
     end
 
     pkg = JSON.parse(r.body)

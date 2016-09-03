@@ -28,16 +28,17 @@ module ConversationActions
     send_to_watson
   end
 
-  def get_location()
-    if error
-      prepare_payload(@key, false)
-      add_context_field("error_msg", "couldn't the required directions")
+  def get_location(ctx)
+    begin
+      gmaps = Navigation::Assistant.new
+      gmaps.directions("Victory Island, Lagos", ctx['location'])
+      @image = gmaps.get_image_url#["secure_url"]
+      gmaps.parse.get_directions
+    rescue
+      prepare_payload(@key, "false")
+      add_context_field("error_msg", "couldn't get the required directions")
       send_to_watson
     end
-    # TODO: get directions
-    # TODO: get map images
-    # TODO: save in var
-    # TODO: return directions
   end
 
   def confirm_check(ctx)

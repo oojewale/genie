@@ -7,8 +7,8 @@ class Api::V1::ConversationsController < ApplicationController
     @watson.prepare_payload(convo_key, msg)
     reply = @watson.send_to_watson
 
-    @response = {text: reply}
-    render json: @response
+    response = { text: reply, image: @watson.image }
+    render json: response
   end
 
   private

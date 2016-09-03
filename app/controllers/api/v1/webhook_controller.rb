@@ -13,7 +13,7 @@ class Api::V1::WebhookController < Api::V1::ConversationsController
         page_id = field["id"]
         if field["postback"]
           fb_user_id = '' #message["sender"]["id"]
-          response = "Got your postback"
+          reply = "Got your postback"
         else
           field["messaging"].each do |message|
             msg = message["message"][:text]
@@ -25,10 +25,10 @@ class Api::V1::WebhookController < Api::V1::ConversationsController
             @watson.add_context_field('username', user["first_name"])
             reply = @watson.send_to_watson
 
-            response = FbTemplateBuilder.default(reply)
+            make_request(fb_user_id, FbTemplateBuilder.image(@watson.image)) if @watson.image
           end
         end
-        make_request(fb_user_id, response)
+        reply.split("\n").reject{|val| val.empty? }.in_groups_of(3, false).each {|group| make_request(fb_user_id, FbTemplateBuilder.default(group.join('\n')))}
       end
     end
 
