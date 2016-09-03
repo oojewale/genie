@@ -1,22 +1,42 @@
 module ConversationActions
+  def new_field(ctx)
+    temp_user = TempNewUser.find_or_create_by(key: @key)
+    acc_num = ""
+    val = ctx['value']
+
+    if ctx['field'] == 'phone'
+      firstname, lastname = temp_user.name.split
+      @user = User.new(email: temp_user.email, phone: val, firstname: firstname, lastname: lastname)
+      acc_num = Faker::Number.number(10)
+      @user.accounts.create(account_num: acc_num, balance: 100000)
+    else
+      temp_user.update_attributes(ctx['field'] => val)
+    end
+
+    prepare_payload(@key, "yes")
+    add_context_field("username", temp_user.name)
+    add_context_field("account_num", acc_num)
+    send_to_watson
+  end
+
   def send_otp(ctx, partial=false)
     otp = rand(10000000...100000000)
     user.otps.create(value: otp)
     TextMessage.send_text("You Secure Code: #{otp}", user.phone)
     return if partial
-    prepare_payload(@key, true)
+    prepare_payload(@key, "yes")
     send_to_watson
   end
 
   def temp_save_field(ctx)
     temp = TempUserUpdate.find_or_initalize_by(user: user)
     temp.update_attributes(ctx['field'] => ctx['value'])
-    prepare_payload(@key, true)
+    prepare_payload(@key, "yes")
     send_to_watson
   end
 
   def confirm_update(ctx)
-    prepare_payload(@key, true)
+    prepare_payload(@key, "yes")
     add_user
     add_context_field('update_msg', 'value')
     send_to_watson
@@ -26,7 +46,7 @@ module ConversationActions
     attr = TempUserUpdate.find_by(user: user).attributes
     attr.delete(:user_id)
     user.update_attributes(attr)
-    prepare_payload(@key, true)
+    prepare_payload(@key, "yes")
     send_to_watson
   end
 
@@ -116,7 +136,7 @@ module ConversationActions
       add_context_field('amount', ctx['amount'])
       add_context_field('receiver_name', transc.receiver.fullname)
     else
-      prepare_payload(@key, false)
+      prepare_payload(@key, "false")
       add_context_field("error_msg", "you have less than #{ctx['amount']} in your account. Your Account balance is #{bal}.")
       add_user
     end
@@ -171,6 +191,6 @@ module ConversationActions
   end
 
   def validation_status(status)
-    add_context_field('valid', status)
+    add_context_field('valid', status.to_s)
   end
 end

@@ -1,0 +1,2 @@
+class TempNewUser < ApplicationRecord
+end
