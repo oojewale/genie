@@ -7,6 +7,7 @@ gem 'pg', '~> 0.18.1'
 gem 'rack-cors', :require => 'rack/cors'
 gem "google_maps_service"
 gem 'cloudinary'
+gem 'twilio-ruby'
 
 # gem 'jbuilder'
 

@@ -1,6 +1,8 @@
 module ConversationActions
   def send_otp(ctx, partial=false)
-    user.otps.create(value: 12345)
+    otp = rand(10000000...100000000)
+    user.otps.create(value: otp)
+    TextMessage.send_text("You Secure Code: #{otp}", user.phone)
     return if partial
     prepare_payload(@key, true)
     send_to_watson
