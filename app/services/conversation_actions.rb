@@ -6,7 +6,7 @@ module ConversationActions
 
     if ctx['field'] == 'phone'
       firstname, lastname = temp_user.name.split
-      @user = User.new(email: temp_user.email, phone: val, firstname: firstname, lastname: lastname)
+      @user = User.create(email: temp_user.email, phone: val, firstname: firstname, lastname: lastname)
       acc_num = Faker::Number.number(10)
       @user.accounts.create(account_num: acc_num, balance: 100000)
     else

@@ -6,6 +6,6 @@ applications:
   name: genie-api
   host: genie-api
   disk_quota: 1024M
-  command: rake db:migrate && bin/rails server -p $PORT -e $RAILS_ENV
+  command: rake db:migrate && rake db:seed && bin/rails server -p $PORT -e $RAILS_ENV
   services:
     - postgres
