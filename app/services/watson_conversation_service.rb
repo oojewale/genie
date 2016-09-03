@@ -55,8 +55,7 @@ class WatsonConversationService
     end
 
     if r.status != 200
-      p "this is paylod #{@payload}"
-      return "Terror has been unleashed in cloud! Wait a while and try again 😰 #{r.body}"
+      return "Terror has been unleashed in cloud! Wait a while and try again 😰"
     end
 
     pkg = JSON.parse(r.body)
@@ -69,7 +68,7 @@ class WatsonConversationService
       return send(act, ctx)
     end
 
-    pkg["output"]["text"].join(", ")
+    pkg["output"]["text"].reject{|txt| txt.empty? }.join(", ")
   end
 
   def parse_response(pkg)

@@ -8,7 +8,8 @@ module ConversationActions
       firstname, lastname = temp_user.name.split
       @user = User.create(email: temp_user.email, phone: val, firstname: firstname, lastname: lastname)
       acc_num = Faker::Number.number(10)
-      @user.accounts.create(account_num: acc_num, balance: 100000)
+      user.accounts.create(account_num: acc_num, balance: 100000)
+      update_context_user(user)
     else
       temp_user.update_attributes(ctx['field'] => val)
     end
