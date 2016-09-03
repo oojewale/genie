@@ -1,4 +1,6 @@
 class WatsonConversationService
+  include ConversationActions
+
   def self.setup
     convo = JSON.parse(ENV["VCAP_SERVICES"])['conversation'].first['credentials']
     wkspace_id = ENV["CONV_WORKSPACE_ID"]
@@ -90,42 +92,15 @@ class WatsonConversationService
     ctx.update_attributes(attributes)
   end
 
-  def validate_account(ctx)
-    acc = Account.includes(:user).find_by(account_num: ctx['account_no'])
-    if acc
-      @user = acc.user
-      update_context_user(user)
-      prepare_payload(@key, 'yes')
-      validation_status(true)
-      add_context_field('username', user.fullname)
-    else
-      validation_status(false)
-    end
-    send_to_watson
-  end
-
-  def validate_otp(ctx)
-    otp = user.otps.find_by(value: ctx['otp'])
-    if otp
-      prepare_payload(@key, 'yes')
-      validation_status(true)
-      add_context_field('username', user.fullname)
-      otp.destroy
-    else
-      add_context_field('valid', false)
-    end
-    send_to_watson
-  end
-
-  def validation_status(status)
-    add_context_field('valid', status)
-  end
-
   def get_stack
     ConversationContext.includes(:user).find_by(key: @key) || ConversationContext.new(key: @key)
   end
 
   def update_context_user(user)
     ConversationContext.find_by(key: @key).update_attributes(user: user)
+  end
+
+  def add_user
+    add_context_field('username', user.try(:fullname))
   end
 end
