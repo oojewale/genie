@@ -1,0 +1,19 @@
+---
+development:
+  cloud_name: di39drj0g
+  api_key: '465349568936945'
+  api_secret: vpZecEcqO88-ISBEZlFEBbwdr5g
+  enhance_image_tag: true
+  static_image_support: false
+production:
+  cloud_name: di39drj0g
+  api_key: '465349568936945'
+  api_secret: vpZecEcqO88-ISBEZlFEBbwdr5g
+  enhance_image_tag: true
+  static_image_support: true
+test:
+  cloud_name: di39drj0g
+  api_key: '465349568936945'
+  api_secret: vpZecEcqO88-ISBEZlFEBbwdr5g
+  enhance_image_tag: true
+  static_image_support: false
