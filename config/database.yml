@@ -5,12 +5,14 @@
 #   gem 'sqlite3'
 #
 default: &default
+  # adapter: sqlite3
   adapter: postgresql
   pool: 5
   timeout: 5000
 
 development:
   <<: *default
+  # database: sqlite3
   database: postgres
 
 # Warning: The database defined as "test" will be erased and
