@@ -5,6 +5,9 @@ gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
 gem 'faraday'
 gem 'pg', '~> 0.18.1'
 gem 'rack-cors', :require => 'rack/cors'
+gem "google_maps_service"
+gem 'cloudinary'
+
 # gem 'jbuilder'
 
 group :development do
