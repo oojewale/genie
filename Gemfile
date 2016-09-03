@@ -3,13 +3,13 @@ source 'https://rubygems.org'
 ruby "2.3.0"
 gem 'rails', '~> 5.0.0', '>= 5.0.0.1'
 gem 'faraday'
-gem 'pg', '~> 0.18.1'
+# gem 'pg', '~> 0.18.1'
+gem 'sqlite3'
 gem 'rack-cors', :require => 'rack/cors'
 gem "google_maps_service"
 gem 'cloudinary'
 gem 'twilio-ruby'
-
-# gem 'jbuilder'
+gem 'ri_cal'
 
 group :development do
   gem 'listen'
