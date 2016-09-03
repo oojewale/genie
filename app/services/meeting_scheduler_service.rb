@@ -17,6 +17,7 @@ class MeetingSchedulerService
         event.dtstart =  Faker::Time.between(DateTime.now + 1, DateTime.now + 3)
         event.dtend = Faker::Time.between(DateTime.now + 4, DateTime.now + 6)
         event.location = "Your office"
+        email = user.try(:email) || "godwin.onisofien@andela.com"
         event.add_attendees [staff_email, user.email]
         event.alarm do
           description "Meeting powered by Genie"
