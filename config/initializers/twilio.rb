@@ -1,4 +1,6 @@
 Twilio.configure do |config|
-  config.account_sid = @account_sid
-  config.auth_token = @auth_token
+  cred = JSON.parse(ENV["VCAP_SERVICES"])["user-provided"].select{|e| e["name"] == "Twilio-y4"}.first["credentials"]
+
+  config.account_sid = cred["accountSID"]
+  config.auth_token = cred["authToken"]
 end
