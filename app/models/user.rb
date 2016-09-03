@@ -7,4 +7,12 @@ class User < ApplicationRecord
   def fullname
     "#{firstname} #{lastname}"
   end
+
+  def get_statement
+    state = accounts.pluck(:account_num, :account_type, :balance).map do |acc|
+      "Account number: #{acc[0]}\nAccount type: #{acc[1]}\nAccount balance: #{acc[2]}\n"
+    end
+
+    state.join("\n")
+  end
 end
