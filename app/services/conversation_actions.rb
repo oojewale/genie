@@ -63,7 +63,7 @@ module ConversationActions
   end
 
   def schedule_delivery(ctx)
-    # TODO: save to delivery database
+    MeetingSchedulerService.new.create(user)
     prepare_payload(@key, 'yes')
     add_user
     add_context_field("address", "user.address")
@@ -71,7 +71,7 @@ module ConversationActions
   end
 
   def schedule_appointment(ctx)
-    # TODO: save to delivery database ctx["time in days"]
+    MeetingSchedulerService.new.create(user)
     prepare_payload(@key, 'yes')
     add_user
     send_to_watson

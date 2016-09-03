@@ -10,10 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160903003229) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 20160903060844) do
 
   create_table "accounts", force: :cascade do |t|
     t.string   "account_num"
@@ -23,7 +20,7 @@ ActiveRecord::Schema.define(version: 20160903003229) do
     t.integer  "user_id"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
-    t.index ["user_id"], name: "index_accounts_on_user_id", using: :btree
+    t.index ["user_id"], name: "index_accounts_on_user_id"
   end
 
   create_table "activities", force: :cascade do |t|
@@ -40,8 +37,8 @@ ActiveRecord::Schema.define(version: 20160903003229) do
     t.integer  "user_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
-    t.index ["transaction_id"], name: "index_activity_logs_on_transaction_id", using: :btree
-    t.index ["user_id"], name: "index_activity_logs_on_user_id", using: :btree
+    t.index ["transaction_id"], name: "index_activity_logs_on_transaction_id"
+    t.index ["user_id"], name: "index_activity_logs_on_user_id"
   end
 
   create_table "atms", force: :cascade do |t|
@@ -51,19 +48,18 @@ ActiveRecord::Schema.define(version: 20160903003229) do
     t.integer  "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_atms_on_account_id", using: :btree
+    t.index ["account_id"], name: "index_atms_on_account_id"
   end
 
   create_table "conversation_contexts", force: :cascade do |t|
     t.string   "key"
-    t.text     "dialog_stack",    default: ["root"],              array: true
     t.integer  "turn_counter",    default: 1
     t.integer  "request_counter", default: 1
     t.string   "convo_id"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
     t.integer  "user_id"
-    t.index ["user_id"], name: "index_conversation_contexts_on_user_id", using: :btree
+    t.index ["user_id"], name: "index_conversation_contexts_on_user_id"
   end
 
   create_table "otps", force: :cascade do |t|
@@ -72,7 +68,15 @@ ActiveRecord::Schema.define(version: 20160903003229) do
     t.integer  "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_otps_on_user_id", using: :btree
+    t.index ["user_id"], name: "index_otps_on_user_id"
+  end
+
+  create_table "staffs", force: :cascade do |t|
+    t.string   "name"
+    t.string   "email"
+    t.string   "phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "temp_transactions", force: :cascade do |t|
@@ -90,7 +94,7 @@ ActiveRecord::Schema.define(version: 20160903003229) do
     t.string   "phone"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_temp_user_updates_on_user_id", using: :btree
+    t.index ["user_id"], name: "index_temp_user_updates_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -101,13 +105,8 @@ ActiveRecord::Schema.define(version: 20160903003229) do
     t.string   "state"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.string   "email"
+    t.string   "phone"
   end
 
-  add_foreign_key "accounts", "users"
-  add_foreign_key "activity_logs", "activities", column: "transaction_id"
-  add_foreign_key "activity_logs", "users"
-  add_foreign_key "atms", "accounts"
-  add_foreign_key "conversation_contexts", "users"
-  add_foreign_key "otps", "users"
-  add_foreign_key "temp_user_updates", "users"
 end
