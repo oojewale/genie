@@ -1,16 +1,25 @@
 class MeetingSchedulerService
-  def calendar_invite(params)
+
+  def create(user)
+    event = calendar_invite(user)
+    if ScheduleMailer.schedule(event).deliver_now
+      render plain: "Meeting booked. We'll get back to you if no one is available."
+    else
+      render plain: "Sorry, we're unable to schedule your meeting @ this time."
+    end
+  end
+
+  def calendar_invite(user)
+    staff_email = Staff.find_by_id(rand(5)).email
     meeting = RiCal.Calendar do |cal|
       cal.event do |event|
-        event.description = params[:description]
-        event.dtstart =  DateTime.parse(params[:start_time]) #("2/20/1962 14:47:39")
-        event.dtend = DateTime.parse(params[:end_time])
+        event.description = Faker::Lorem.sentence
+        event.dtstart =  Faker::Time.between(DateTime.now + 1, DateTime.now + 3)
+        event.dtend = Faker::Time.between(DateTime.now + 4, DateTime.now + 6)
         event.location = "Your office"
-        # event.add_attendee [Staff.first.email, params[:user].email]
-        event.add_attendees ["ojewaleolaide@gmail.com", "olaide.ojewale@andela.com"]
+        event.add_attendees [staff_email, user.email]
         event.alarm do
-          description "Meeting with Olaide"
-          # description "Meeting with #{params[:user].firstname}"
+          description "Meeting powered by Genie"
         end
       end
     end
