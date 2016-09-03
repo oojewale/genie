@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160902164119) do
+ActiveRecord::Schema.define(version: 20160903003229) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,6 +75,24 @@ ActiveRecord::Schema.define(version: 20160902164119) do
     t.index ["user_id"], name: "index_otps_on_user_id", using: :btree
   end
 
+  create_table "temp_transactions", force: :cascade do |t|
+    t.integer  "amount"
+    t.integer  "sender_id"
+    t.integer  "receiver_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  create_table "temp_user_updates", force: :cascade do |t|
+    t.integer  "user_id"
+    t.string   "email"
+    t.string   "address"
+    t.string   "phone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_temp_user_updates_on_user_id", using: :btree
+  end
+
   create_table "users", force: :cascade do |t|
     t.string   "firstname"
     t.string   "lastname"
@@ -91,4 +109,5 @@ ActiveRecord::Schema.define(version: 20160902164119) do
   add_foreign_key "atms", "accounts"
   add_foreign_key "conversation_contexts", "users"
   add_foreign_key "otps", "users"
+  add_foreign_key "temp_user_updates", "users"
 end
