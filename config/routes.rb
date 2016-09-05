@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       post 'conversations/web_mobile'
       get "/webhook", to: "webhook#verify"
       post "/webhook", to: "webhook#handler"
+      post "recieve-sms", to: "conversations#recieve_sms"
     end
   end
 end
