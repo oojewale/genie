@@ -9,7 +9,7 @@ class WatsonConversationService
     new(url, convo)
   end
 
-  attr_reader :watson_connection, :entities, :intents, :verdict, :user, :image
+  attr_reader :watson_connection, :user, :image
 
   def initialize(url, convo)
     @watson_connection = Faraday.new(url: url) do |f|
@@ -59,22 +59,16 @@ class WatsonConversationService
     end
 
     pkg = JSON.parse(r.body)
-    save_context(pkg)
-    parse_response(pkg)
-
     ctx = pkg['context']
-    if pkg['context']['action']
+
+    ctx["clear_context"].nil? ? save_context(pkg) : clear_context
+
+    if ctx['action']
       act = ctx['action']
       return send(act, ctx)
     end
 
     pkg["output"]["text"].reject{|txt| txt.empty? }.join(", ")
-  end
-
-  def parse_response(pkg)
-    @entities = pkg["entities"]
-    @intents = pkg["intents"]
-    @verdict = pkg["output"]
   end
 
   def save_context(pkg)
@@ -94,6 +88,11 @@ class WatsonConversationService
            }
     attributes[:user_id] = user.id if user
     ctx.update_attributes(attributes)
+  end
+
+  def clear_context
+    convo = ConversationContext.find_by(key: @key)
+    convo.destroy if convo
   end
 
   def get_stack
