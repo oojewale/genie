@@ -7,4 +7,5 @@ Rails.application.routes.draw do
       post "receive-sms", to: "conversations#receive_sms"
     end
   end
+match '*path', to: redirect("https://andela-gogbara.github.io/genie-web/"), via: :all
 end
