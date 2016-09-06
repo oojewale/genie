@@ -30,7 +30,7 @@ class Api::V1::ConversationsController < ApplicationController
   end
 
   def permitted_params
-    params.permit(:message)
+    params.permit(:message, :token)
   end
 
   def setup_watson
