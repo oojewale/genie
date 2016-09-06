@@ -4,7 +4,7 @@ class WatsonConversationService
   def self.setup
     convo = JSON.parse(ENV["VCAP_SERVICES"])['conversation'].first['credentials']
     wkspace_id = ENV["CONV_WORKSPACE_ID"]
-    url = convo['url'] + '/v1/workspaces/' +wkspace_id + '/message?version=2016-07-11'
+    url = convo['url'] + '/v1/workspaces/' + wkspace_id + '/message?version=2016-07-11'
 
     new(url, convo)
   end

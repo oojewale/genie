@@ -26,7 +26,7 @@ class Api::V1::ConversationsController < ApplicationController
     msg = params["Body"] || ""
     convo_key = params["From"]
     @watson.prepare_payload(convo_key, msg)
-    reply = @watson.send_to_watson
+    @watson.send_to_watson
   end
 
   def permitted_params

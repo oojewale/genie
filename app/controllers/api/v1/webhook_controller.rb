@@ -10,7 +10,7 @@ class Api::V1::WebhookController < Api::V1::ConversationsController
   def handler
     if params["object"] == "page"
       params["entry"].each do |field|
-        page_id = field["id"]
+        # page_id = field["id"]
         if field["postback"]
           fb_user_id = '' #message["sender"]["id"]
           reply = "Got your postback"
@@ -54,7 +54,7 @@ class Api::V1::WebhookController < Api::V1::ConversationsController
     uri = 'https://graph.facebook.com/v2.6/me/messages'
     uri += '?access_token=' + token
 
-    stat = Faraday.new(url: uri).post do |req|
+    Faraday.new(url: uri).post do |req|
       req.body = response.to_json
       req.headers['Content-Type'] = 'application/json'
     end

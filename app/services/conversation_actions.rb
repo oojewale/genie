@@ -22,6 +22,7 @@ module ConversationActions
 
   def send_otp(ctx, partial=false)
     otp = rand(10000000...100000000)
+    @user ||= User.last
     user.otps.create(value: otp)
     TextMessage.send_text("You Secure Code: #{otp}", user.phone)
     return if partial
@@ -30,6 +31,7 @@ module ConversationActions
   end
 
   def temp_save_field(ctx)
+    @user ||= User.last
     temp = TempUserUpdate.find_or_initalize_by(user: user)
     temp.update_attributes(ctx['field'] => ctx['value'])
     prepare_payload(@key, "yes")
@@ -44,6 +46,7 @@ module ConversationActions
   end
 
   def save_update(ctx)
+    @user ||= User.last
     attr = TempUserUpdate.find_by(user: user).attributes
     attr.delete(:user_id)
     user.update_attributes(attr)
@@ -65,6 +68,7 @@ module ConversationActions
   end
 
   def confirm_check(ctx)
+    @user ||= User.last
     # TODO: query database
     if true
       prepare_payload(@key, "yes")
@@ -77,6 +81,7 @@ module ConversationActions
   end
 
   def check_atm_status(ctx)
+    @user ||= User.last
     prepare_payload(@key, 'yes')
     add_user
     add_context_field('card_type', "from Db")
@@ -84,6 +89,7 @@ module ConversationActions
   end
 
   def schedule_delivery(ctx)
+    @user ||= User.last
     MeetingSchedulerService.new.create(user)
     prepare_payload(@key, 'yes')
     add_user
@@ -92,6 +98,7 @@ module ConversationActions
   end
 
   def schedule_appointment(ctx)
+    @user ||= User.last
     MeetingSchedulerService.new.create(user)
     prepare_payload(@key, 'yes')
     add_user
@@ -99,6 +106,7 @@ module ConversationActions
   end
 
   def atm_application(ctx)
+    @user ||= User.last
     # TODO: save application to the db
     prepare_payload(@key, 'yes')
     add_context_field("card_type", ctx["card_type"])
@@ -107,6 +115,7 @@ module ConversationActions
   end
 
   def update_alert(ctx)
+    @user ||= User.last
     # TODO: save to database User.alerts.update ctx["value"] => enable or disable
     prepare_payload(@key, 'yes')
     add_user
@@ -115,6 +124,7 @@ module ConversationActions
   end
 
   def validate_receiver_account(ctx)
+    @user ||= User.last
     acc = Account.includes(:user).find_by(account_num: ctx['account_no'])
     if acc
       TempTransaction.create_with(receiver: acc.user).find_or_create_by(sender: user)
@@ -129,6 +139,7 @@ module ConversationActions
   end
 
   def save_amount_to_transfer(ctx)
+    @user ||= User.last
     bal = user.accounts.first.balance
     if bal > ctx['amount']
       transc = TempTransaction.find_by(sender_id: user.id).update_attributes(amount: ctx['amount'])
@@ -146,6 +157,7 @@ module ConversationActions
   end
 
   def make_transaction(ctx)
+   @user ||= User.last
     transc = TempTransaction.find_by(sender_id: user_id)
     transc.sender.accounts.first.decrement(:balance, transc.amount)
     transc.receiver.accounts.first.increment(:balance, transc.amount)
@@ -171,6 +183,7 @@ module ConversationActions
   end
 
   def validate_otp(ctx)
+    @user ||= User.last
     otp = user.otps.find_by(value: ctx['otp'])
     if otp
       add_user
@@ -184,6 +197,7 @@ module ConversationActions
   end
 
   def get_statement(ctx)
+    @user ||= User.last
     acc = user.get_statement
     prepare_payload(@key, 'yes')
     add_user
