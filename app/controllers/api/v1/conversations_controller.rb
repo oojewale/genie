@@ -11,7 +11,7 @@ class Api::V1::ConversationsController < ApplicationController
     render json: response
   end
 
-  def recieve_sms
+  def receive_sms
     response = Twilio::TwiML::Response.new do |r|
       r.Message do |b|
         b.Body sms_response
