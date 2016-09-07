@@ -90,7 +90,7 @@ module ConversationActions
 
   def schedule_delivery(ctx)
     @user ||= User.last
-    # MeetingSchedulerService.new.create(user)
+    MeetingSchedulerService.new.create(user)
     prepare_payload(@key, 'yes')
     add_user
     add_context_field("address", "user.address")
@@ -126,14 +126,16 @@ module ConversationActions
 
   def validate_receiver_account(ctx)
     @user ||= User.last
-    acc = Account.includes(:user).find_by(account_num: ctx['account_no'])
+    acc = Account.includes(:user).find_by(account_num: ctx['account_number'])
     if acc
-      TempTransaction.create_with(receiver: acc.user).find_or_create_by(sender: user)
+      transc = TempTransaction.find_or_initialize_by(sender: user)
+      transc.update_attributes(receiver: acc.user)
       prepare_payload(@key, 'yes')
       add_context_field("receiver_name", acc.user.fullname)
       validation_status(true)
       add_user
     else
+      prepare_payload(@key, 'false')
       validation_status(false)
     end
     send_to_watson
@@ -142,8 +144,9 @@ module ConversationActions
   def save_amount_to_transfer(ctx)
     @user ||= User.last
     bal = user.accounts.first.balance
-    if bal > ctx['amount']
-      transc = TempTransaction.find_by(sender_id: user.id).update_attributes(amount: ctx['amount'])
+    if bal > ctx['amount'].to_i
+      transc = TempTransaction.find_by(sender_id: user.id)
+      transc.update_attributes(amount: ctx['amount'])
       prepare_payload(@key, "yes")
       add_user
       add_context_field('amount', ctx['amount'])
@@ -159,9 +162,9 @@ module ConversationActions
 
   def make_transaction(ctx)
    @user ||= User.last
-    transc = TempTransaction.find_by(sender_id: user_id)
-    transc.sender.accounts.first.decrement(:balance, transc.amount)
-    transc.receiver.accounts.first.increment(:balance, transc.amount)
+    transc = TempTransaction.find_by(sender_id: user.id)
+    transc.sender.accounts.first.decrement!(:balance, transc.amount)
+    transc.receiver.accounts.first.increment!(:balance, transc.amount)
     transc.destroy
 
     prepare_payload(@key, 'yes')
