@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160903113428) do
+ActiveRecord::Schema.define(version: 20160907083256) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,6 +64,16 @@ ActiveRecord::Schema.define(version: 20160903113428) do
     t.datetime "updated_at",                         null: false
     t.integer  "user_id"
     t.index ["user_id"], name: "index_conversation_contexts_on_user_id", using: :btree
+  end
+
+  create_table "login_contexts", force: :cascade do |t|
+    t.string   "key"
+    t.text     "dialog_stack",    default: ["root"],              array: true
+    t.integer  "turn_counter"
+    t.integer  "request_counter"
+    t.string   "convo_id"
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
   end
 
   create_table "otps", force: :cascade do |t|

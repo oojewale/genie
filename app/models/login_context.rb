@@ -1,0 +1,2 @@
+class LoginContext < ApplicationRecord
+end
