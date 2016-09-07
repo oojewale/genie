@@ -95,6 +95,28 @@ class WatsonConversationService
     convo.destroy if convo
   end
 
+  def save_login_context(pkg)
+    login_ctx = LoginContext.find_or_initialize_by(key: @key)
+    ctx = ConversationContext.find_by(key: @key).attributes
+    ctx.delete("user_id")
+    ctx.delete("id")
+
+    login_ctx.update_attributes(ctx)
+    prepare_payload(@key, "yes")
+    send_to_watson
+  end
+
+  def reset_login_context(pkg)
+    login_ctx = LoginContext.find_by(key: @key)
+    ctx = login_ctx.attributes
+    ctx.delete("id")
+    login_ctx.destroy
+    ConversationContext.find_by(key: @key).update_attributes(ctx)
+    prepare_payload(@key, "false")
+    add_user
+    send_to_watson
+  end
+
   def get_stack
     ConversationContext.includes(:user).find_by(key: @key) || ConversationContext.new(key: @key)
   end

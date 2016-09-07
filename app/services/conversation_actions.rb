@@ -84,13 +84,13 @@ module ConversationActions
     @user ||= User.last
     prepare_payload(@key, 'yes')
     add_user
-    add_context_field('card_type', "from Db")
+    add_context_field('card_type', "")
     send_to_watson
   end
 
   def schedule_delivery(ctx)
     @user ||= User.last
-    MeetingSchedulerService.new.create(user)
+    # MeetingSchedulerService.new.create(user)
     prepare_payload(@key, 'yes')
     add_user
     add_context_field("address", "user.address")
@@ -99,8 +99,9 @@ module ConversationActions
 
   def schedule_appointment(ctx)
     @user ||= User.last
-    MeetingSchedulerService.new.create(user)
+    status = MeetingSchedulerService.new.create(user)
     prepare_payload(@key, 'yes')
+    add_context_field("schedule_status", status)
     add_user
     send_to_watson
   end
@@ -186,6 +187,7 @@ module ConversationActions
     @user ||= User.last
     otp = user.otps.find_by(value: ctx['otp'])
     if otp
+      update_context_user(user)
       add_user
       prepare_payload(@key, 'yes')
       validation_status(true)
