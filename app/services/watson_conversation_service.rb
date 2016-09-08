@@ -9,7 +9,7 @@ class WatsonConversationService
     new(url, convo)
   end
 
-  attr_reader :watson_connection, :user, :image
+  attr_reader :watson_connection, :user, :image, :context
 
   def initialize(url, convo)
     @watson_connection = Faraday.new(url: url) do |f|
@@ -78,7 +78,7 @@ class WatsonConversationService
     request_counter = ctx["dialog_request_counter"]
     wID = pkg["conversation_id"]
 
-    ctx = get_stack || ConversationContext.new(key: @key)
+    ctx = get_stack
     @user = ctx.user if ctx.user_id
     attributes = {
              dialog_stack: stack,
@@ -91,13 +91,13 @@ class WatsonConversationService
   end
 
   def clear_context
-    convo = ConversationContext.find_by(key: @key)
-    convo.destroy if convo
+    convo = get_stack
+    convo.destroy unless convo.new_record?
   end
 
   def save_login_context(pkg)
     login_ctx = LoginContext.find_or_initialize_by(key: @key)
-    ctx = ConversationContext.find_by(key: @key).attributes
+    ctx = get_stack.attributes
     ctx.delete("user_id")
     ctx.delete("id")
 
@@ -118,7 +118,8 @@ class WatsonConversationService
   end
 
   def get_stack
-    ConversationContext.includes(:user).find_by(key: @key) || ConversationContext.new(key: @key)
+    @context ||= ConversationContext.includes(:user).find_by(key: @key) || ConversationContext.new(key: @key)
+    context
   end
 
   def update_context_user(user)
